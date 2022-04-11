@@ -1,6 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import { setup, ObjectId } from './mongo';
+import config from './config.json';
 
 async function main() {
   const Post = await setup();
@@ -34,24 +35,22 @@ async function main() {
   });
 
   server.get('/post', async (req, res) => {
-    const author = req.body.author;
+    const author = req.query.author;
 
-    if (author) {
-      const posts = await Post.find({ author: new ObjectId(author) }); 
-      res.send({
-        posts: posts,
-        ...statusGood
-      }); 
+    let posts;
+    if (!author) {
+      posts = await Post.find({});
     } else {
-      const posts = await Post.find({});
-      res.send({
-        posts: posts,
-        ...statusGood
-      }); 
+      posts = await Post.find({ author: new ObjectId(author.toString()) }); 
     }
+
+    res.send({
+      posts: posts,
+      ...statusGood
+    }); 
   });
 
-  server.listen(3001, () => console.log("Post Service Started"));
+  server.listen(config.postServicePort, () => console.log("Post Service Started"));
 }
 
 main().catch(reason => console.error(reason));
