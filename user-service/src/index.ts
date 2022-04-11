@@ -21,7 +21,7 @@ async function main() {
       return;
     }
 
-    res.send(await User.findById(new Object(id)));
+    res.send(await User.findById(new ObjectId(id.toString())));
   });
 
   server.post('/register', async (req, res) => {
