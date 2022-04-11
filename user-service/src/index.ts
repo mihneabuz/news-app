@@ -60,8 +60,6 @@ async function main() {
       return;
     }
 
-    console.log(user);
-
     res.send({
       id: user._id,
       username: user.username,
@@ -74,7 +72,7 @@ async function main() {
   server.listen(3000, () => console.log("User Service Started"));
 }
 
-main().catch(reason => console.log(reason));
+main().catch(reason => console.error(reason));
 
 const statusGood = { success: true, message: "ok" };
 const statusBad = (msg: string) => ({ success: false, message: msg });

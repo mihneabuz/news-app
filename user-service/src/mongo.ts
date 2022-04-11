@@ -7,7 +7,7 @@ async function setup() {
   const User = mongoose.model(
     'user', 
     new mongoose.Schema({
-      username: String,
+      username: { type: String, index: true },
       password: String,
       type: String,
       created_at: Date,
