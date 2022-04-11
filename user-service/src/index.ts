@@ -1,6 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-import setup from './mongo';
+import { setup, ObjectId } from './mongo';
+import config from './config.json';
 
 type UserType = 'reader' | 'journalist';
 
@@ -11,6 +12,17 @@ async function main() {
   server.use(bodyParser.json());
 
   server.get('/running', (_, res) => res.send("OK"));
+
+  server.get('/info', async (req, res) => {
+    const id = req.query.id;
+
+    if (!id) {
+      res.send(statusBad("bad request"));
+      return;
+    }
+
+    res.send(await User.findById(new Object(id)));
+  });
 
   server.post('/register', async (req, res) => {
     const username: string = req.body.username;
@@ -69,7 +81,7 @@ async function main() {
     });
   });
 
-  server.listen(3000, () => console.log("User Service Started"));
+  server.listen(config.userServicePort, () => console.log("User Service Started"));
 }
 
 main().catch(reason => console.error(reason));

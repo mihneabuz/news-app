@@ -17,4 +17,6 @@ async function setup() {
   return User;
 }
 
-export default setup;
+const ObjectId = mongoose.Types.ObjectId;
+
+export { setup, ObjectId };
