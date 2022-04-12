@@ -35,20 +35,37 @@ async function main() {
   });
 
   server.get('/post', async (req, res) => {
-    const author = req.query.author;
+    let filter: any = {};
 
-    let posts;
-    if (!author) {
-      posts = await Post.find({});
-    } else {
-      posts = await Post.find({ author: new ObjectId(author.toString()) }); 
+    const author = req.query.author;
+    if (author) {
+      filter.author = new ObjectId(author.toString());
     }
 
+    const tag = req.query.tag;
+    if (tag) {
+      filter.tags = tag;
+    }
+
+    const posts = await Post.find(filter); 
     res.send({
       posts: posts,
       ...statusGood
     }); 
   });
+
+  server.put('/post/tag', async (req, res) => {
+    const id = req.body.id;
+    const tag = req.body.tag;
+
+    if (!id || !tag) {
+      res.send(statusBad('bad request'));
+      return;
+    }
+
+    await Post.findByIdAndUpdate(new ObjectId(id), { $push: { tags: tag } });
+    res.send(statusGood);
+  })
 
   server.listen(config.postServicePort, () => console.log("Post Service Started"));
 }

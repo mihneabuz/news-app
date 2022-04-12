@@ -35,7 +35,6 @@ postRouter.use((req, res, next) => {
 
 postRouter.post('/create', async (req, res) => {
   if (res.locals.type != 'journalist') {
-    console.log("nu tu ma");
     res.statusCode = 401;
     res.send(statusBad("unauthorized"));
     return;
@@ -57,12 +56,39 @@ postRouter.post('/create', async (req, res) => {
 })
 
 postRouter.put('/tag', async (req, res) => {
+  if (res.locals.type != 'reader') {
+    res.statusCode = 401;
+    res.send(statusBad("unauthorized"));
+    return;
+  }
+
+  const result = await fetch(
+    postService + '/tag',
+    {
+      method: 'PUT',
+      body: JSON.stringify(req.body),
+      headers: {'Content-Type': 'application/json'}
+    }
+  );
+
+  res.send(await result.json());
 })
 
 postRouter.get('/', async (req, res) => {
   const author = req.query.author;
-  const result = await fetch(postService + (!author ? '' : `?author=${author}`));
+  const tag = req.query.tag;
 
+  let query = postService;
+  if (author && tag)
+    query += `?author=${author}&tag=${tag}`;
+
+  else if (author)
+    query += `?author=${author}`;
+
+  else if (tag)
+    query += `?tag=${tag}`;
+
+  const result = await fetch(query);
   res.send(await result.json());
 });
 
