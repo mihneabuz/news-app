@@ -13,6 +13,22 @@ async function main() {
 
   server.get('/running', (_, res) => res.send("OK"));
 
+  server.post('/usernames', async (req, res) => {
+    const ids = req.body.ids;
+    console.log(req.body);
+    if (ids && Array.isArray(ids)) {
+      const users = await User.find().where('_id').in(ids.map(x => new ObjectId(x)));
+      console.log(users);
+
+      res.send({
+        users: users.map(user => ({ id: user._id, username: user.username })),
+        ...statusGood
+      });
+    } else {
+      res.send(statusBad("bad request"));
+    }
+  });
+
   server.get('/info', async (req, res) => {
     const id = req.query.id;
 

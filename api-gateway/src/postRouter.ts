@@ -5,6 +5,9 @@ import config from './config.json' assert { type: 'json' };
 
 const postRouter = express.Router();
 const postService = `http://${config.postServiceAddr}:${config.postServicePort}/post`;
+const userService = `http://${config.userServiceAddr}:${config.userServicePort}`;
+
+const userCache = new Map();
 
 postRouter.use((req, res, next) => {
   const auth = req.get('authorization');
@@ -88,10 +91,39 @@ postRouter.get('/', async (req, res) => {
   else if (tag)
     query += `?tag=${tag}`;
 
-  const result = await fetch(query);
-  res.send(await result.json());
+  let result: any = await (await fetch(query)).json();
+
+  let notCached = new Set();
+  for (var post of result.posts) {
+    if (userCache.has(post.author))
+      post.authorUsername = userCache.get(post.author);
+    else
+      notCached.add(post.author);
+  }
+
+  if (notCached.size > 0) {
+    const mappings: any = await (await fetch(
+      userService + '/usernames',
+      {
+        method: 'POST',
+        body: JSON.stringify({ ids: Array.from(notCached) }),
+        headers: {'Content-Type': 'application/json'}
+      }
+    )).json();
+
+    for (var mapping of mappings.users) {
+      userCache.set(mapping.id, mapping.username);
+    }
+
+    for (var post of result.posts) {
+      if (!post.authorUsername)
+        post.authorUsername = userCache.get(post.author);
+    }
+  }
+
+  res.send(result);
 });
 
-const statusBad = (msg: string) => ({ success: false, message: msg});
+const statusBad = (msg: string) => ({ success: false, message: msg });
 
 export default postRouter;

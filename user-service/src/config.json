@@ -1,0 +1,12 @@
+{
+    "userServiceAddr": "localhost",
+    "userServicePort": "3001",
+
+    "postServiceAddr": "localhost",
+    "postServicePort": "3002",
+
+    "apiGatewayAddr": "localhost",
+    "apiGatewayPort": "3003",
+
+    "secret": "verysecretmuchwow"
+}
