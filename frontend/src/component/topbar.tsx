@@ -1,4 +1,3 @@
-import React from 'react';
 import { useDispatch } from 'react-redux';
 import { goHome, goRegister, goLogin } from '../state/screenSlice';
 
