@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
+import jwtDecode from 'jwt-decode';
 
 export const screenSlice = createSlice({
   name: 'user',
@@ -12,9 +13,11 @@ export const screenSlice = createSlice({
     logIn: (state, args) => {
       state.loggedIn = true;
       state.jwt = args.payload; 
-      console.log(state.jwt);
+      const payload: any = jwtDecode(state.jwt);
+      state.username = payload.username;
+      state.type = payload.type;
     },
-    logOut: (state, args) => {
+    logOut: (state) => {
       state.loggedIn = false;
       state.username = '';
       state.type = '';

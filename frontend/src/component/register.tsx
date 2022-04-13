@@ -1,17 +1,29 @@
+import { useState } from 'react';
 import netclient from "../utils/netclient";
 
 function Register() {
-  let username: string = "";
-  let password1: string = "";
-  let password2: string = "";
-  let role: string = "";
+  const [message, setMessage] = useState("");
+  const [userData, setUserData] = useState({username: "", password1: "", password2: "", role: ""});
 
-  const handleSubmit = () => {
-    console.log(username);
-    console.log(password1);
-    console.log(password2);
-    console.log(role);
-    netclient.register({ username: username, password: password1, role: role});
+  const handleSubmit = async () => {
+    if (userData.username === "" || userData.password1 === "" || userData.password2 === "" || userData.role === "") {
+      setMessage("Complete all fields!");
+      return;
+    }
+
+    if (userData.password1 !== userData.password2) {
+      setMessage("Passwords do not match!");
+      return;
+    }
+
+    const res = await netclient.register({ username: userData.username, password: userData.password1, type: userData.role});
+
+    if (!res.success) {
+      setMessage(res.message);
+    } else {
+      setUserData({username: "", password1: "", password2: "", role: ""});
+      setMessage("ok");
+    }
   };
 
   return (
@@ -23,25 +35,29 @@ function Register() {
                     type="text"
                     className="border border-gray-300 w-full p-3 rounded mb-4"
                     name="username"
-                    onChange={(event) => username = event.target.value}
+                    value={userData.username}
+                    onChange={(event) => setUserData(prev => ({...prev, username: event.target.value}))}
                     placeholder="Username" />
 
                 <input 
                     type="password"
                     className="border border-gray-300 w-full p-3 rounded mb-4"
                     name="password"
-                    onChange={(event) => password1 = event.target.value}
+                    value={userData.password1}
+                    onChange={(event) => setUserData(prev => ({...prev, password1: event.target.value}))}
                     placeholder="Password" />
 
                 <input 
                     type="password"
                     className="border border-gray-300 w-full p-3 rounded mb-4"
                     name="confirm_password"
-                    onChange={(event) => password2 = event.target.value}
+                    value={userData.password2}
+                    onChange={(event) => setUserData(prev => ({...prev, password2: event.target.value}))}
                     placeholder="Confirm Password" />
 
                 <select 
-                    onChange={(event) => role = event.target.value}
+                    onChange={(event) => setUserData(prev => ({...prev, role: event.target.value}))}
+                    value={userData.role}
                     className="form-select appearance-none
                     w-full
                     p-3
@@ -56,6 +72,10 @@ function Register() {
                     <option value="reader"> Reader </option>
                     <option value="journalist"> Journalist </option>
                 </select>
+
+                <div className="container items-center flex flex-col h-8">
+                  <h3 className="text-red-400"> {message} </h3>
+                </div>          
 
                 <button
                     type="submit"

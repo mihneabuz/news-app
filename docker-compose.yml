@@ -26,6 +26,16 @@ services:
       - user-service
       - post-service
 
+  frontend:
+    container_name: news-app-frontend
+    build:
+      dockerfile: Dockerfile
+      context: ./frontend
+    ports:
+      - 3001:3000
+    links:
+      - api-gateway
+
   mongo:
     container_name: news-app-mongo
     image: mongo
