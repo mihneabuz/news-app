@@ -1,10 +1,10 @@
 import express from 'express';
 import fetch from 'node-fetch';
 import jwt from 'jsonwebtoken';
-import config from './config.json' assert { type: 'json' };
+import secret from './secret.js';
 
 const userRouter = express.Router();
-const userService = `http://${config.userServiceAddr}:${config.userServicePort}`;
+const userService = 'http://user-service:3000';
 
 userRouter.get('/info', async (req, res) => {
   const auth = req.get('authorization');
@@ -16,7 +16,7 @@ userRouter.get('/info', async (req, res) => {
   }
 
   try {
-    const identity: any = jwt.verify(auth.split(' ')[1], config.secret);
+    const identity: any = jwt.verify(auth.split(' ')[1], secret);
     if (identity.expires_at < Date.now()) {
       res.statusCode = 401;
       res.send(statusBad("unauthorized"));
@@ -54,7 +54,7 @@ userRouter.post('/login', async (req, res) => {
     username: resultBody.username,
     type: resultBody.type,
     expires_at: Date.now() + (60 * 60 * 1000)
-  }, config.secret, { noTimestamp: true });
+  }, secret, { noTimestamp: true });
 
   res.send({
     jwt: token,

@@ -2,7 +2,6 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import postRouter from './postRouter.js';
 import userRouter from './userRouter.js';
-import config from './config.json' assert { type: 'json' };
 
 async function main() {
   const server = express();
@@ -13,7 +12,7 @@ async function main() {
   server.use('/user', userRouter);
   server.use('/post', postRouter);
 
-  server.listen(config.apiGatewayPort, () => console.log("Started API Gateway"));
+  server.listen(3000, () => console.log("Started API Gateway"));
 }
 
 main().catch(reason => console.error(reason));

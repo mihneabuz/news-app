@@ -1,11 +1,11 @@
 import express from 'express';
 import fetch from 'node-fetch';
 import jwt from 'jsonwebtoken';
-import config from './config.json' assert { type: 'json' };
+import secret from './secret.js';
 
 const postRouter = express.Router();
-const postService = `http://${config.postServiceAddr}:${config.postServicePort}/post`;
-const userService = `http://${config.userServiceAddr}:${config.userServicePort}`;
+const postService = 'http://post-service:3000/post';
+const userService = 'http://user-service:3000';
 
 const userCache = new Map();
 
@@ -19,7 +19,7 @@ postRouter.use((req, res, next) => {
   }
 
   try {
-    const identity: any = jwt.verify(auth.split(' ')[1], config.secret);
+    const identity: any = jwt.verify(auth.split(' ')[1], secret);
     if (identity.expires_at < Date.now()) {
       res.statusCode = 401;
       res.send(statusBad("unauthorized"));
