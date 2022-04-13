@@ -5,7 +5,22 @@ import userRouter from './userRouter.js';
 
 async function main() {
   const server = express();
-  server.use(bodyParser.json());
+  // NOTE: this is used for testing
+  server.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+    if (req.method === "OPTIONS") {
+      res.statusCode = 200;
+      res.send();
+      return;
+    }
+
+    next();
+  });
+
+  server.use(bodyParser.json({ type: "*/*" }));
 
   server.get('/running', (_, res) => { res.send('OK') });
 
