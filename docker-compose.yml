@@ -1,0 +1,35 @@
+services:
+  user-service:
+    container_name: news-app-user-service
+    build:
+      dockerfile: Dockerfile
+      context: ./user-service
+    links:
+      - mongo
+
+  post-service:
+    container_name: news-app-post-service
+    build:
+      dockerfile: Dockerfile
+      context: ./post-service
+    links:
+      - mongo
+
+  api-gateway:
+    container_name: news-app-api-gateway
+    build:
+      dockerfile: Dockerfile
+      context: ./api-gateway
+    ports: 
+      - 3000:3000
+    links:
+      - user-service
+      - post-service
+
+  mongo:
+    container_name: news-app-mongo
+    image: mongo
+    ports:
+      - 27017:27017
+    volumes:
+      - ~/data/mongo:/data/db
