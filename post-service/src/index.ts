@@ -1,7 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import { setup, ObjectId } from './mongo';
-import config from './config.json';
 
 async function main() {
   const Post = await setup();
@@ -67,7 +66,7 @@ async function main() {
     res.send(statusGood);
   })
 
-  server.listen(config.postServicePort, () => console.log("Post Service Started"));
+  server.listen(3000, () => console.log("Post Service Started"));
 }
 
 main().catch(reason => console.error(reason));

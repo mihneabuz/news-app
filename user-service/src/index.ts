@@ -1,7 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import { setup, ObjectId } from './mongo';
-import config from './config.json';
 
 type UserType = 'reader' | 'journalist';
 
@@ -15,10 +14,8 @@ async function main() {
 
   server.post('/usernames', async (req, res) => {
     const ids = req.body.ids;
-    console.log(req.body);
     if (ids && Array.isArray(ids)) {
       const users = await User.find().where('_id').in(ids.map(x => new ObjectId(x)));
-      console.log(users);
 
       res.send({
         users: users.map(user => ({ id: user._id, username: user.username })),
@@ -97,7 +94,7 @@ async function main() {
     });
   });
 
-  server.listen(config.userServicePort, () => console.log("User Service Started"));
+  server.listen(3000, () => console.log("User Service Started"));
 }
 
 main().catch(reason => console.error(reason));
